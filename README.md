@@ -8,9 +8,10 @@
 /api/posts/delete/{id} | DELETE  faqat kommentariya egasi va admin 
 /api/posts/update | PUT faqat kommentariya egasi | id bodyda jo'natilsin 
   ```
+ > Barchasi PROTETED API
  > Post uchun bodyda yuboriladigan ma'lumotlar
  ``` body:
-   * description: String _
+   * description: String 
 ```
 ## Api for Owner
 ```
@@ -38,7 +39,7 @@
 * instagram: String
 ```
 
-> Admin va Owner uchun headerda barcha zaproslarda token(barchasi protected api lardir)
+> Admin va Owner uchun headerda barcha zaproslarda token(barchasi PROTECTED API lardir)
 
 ## Api For Auth
 ```
