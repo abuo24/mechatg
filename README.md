@@ -9,6 +9,7 @@
 /api/posts/update | PUT faqat kommentariya egasi | id bodyda jo'natilsin 
   ```
  > Barchasi PROTETED API
+ 
  > Post uchun bodyda yuboriladigan ma'lumotlar
  ``` body:
    * description: String 
