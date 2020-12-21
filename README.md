@@ -67,4 +67,6 @@
 ```
 > Protected API larda HEADER da token jo`natish kerak
 
-``` Authorization: Bearer token ```
+``` 
+Authorization: Bearer token 
+```
