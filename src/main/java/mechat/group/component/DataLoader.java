@@ -20,7 +20,7 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
-   private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepo userRepository;
 
@@ -51,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
         } catch (Exception e) {
             System.out.println(e);
         }
-  }
+    }
 
 
     private List<String> getRoleNames(Set<Role> userRoles) {
