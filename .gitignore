@@ -1,7 +1,7 @@
 <<<<<<< HEAD
-.idea
-.mvn
-target
+*.idea
+*.mvn
+*.target
 =======
 *.idea
 >>>>>>> 123e040da0260ac0ac7062653430b2e908ef3182
