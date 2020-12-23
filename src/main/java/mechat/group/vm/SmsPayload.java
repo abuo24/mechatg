@@ -13,5 +13,4 @@ public class SmsPayload {
     private final String phoneNumber;
     @NotNull
     private final String message;
-
 }
