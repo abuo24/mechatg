@@ -7,6 +7,7 @@ import mechat.group.repository.PostRepo;
 import mechat.group.repository.RoleRepository;
 import mechat.group.repository.UserRepo;
 import mechat.group.security.JwtTokenProvider;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,17 +31,24 @@ public class UserServiceImp {
     @Autowired
     private PostRepo postRepository;
 
+    private final Hashids hashids;
+
+
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public User getUser(Long id) {
-        try {
-            return userRepo.findById(id).get();
-        } catch (Exception e) {
-            System.out.println(e);
-            return null;
-        }
+    public UserServiceImp() {
+        this.hashids = new Hashids(getClass().getName(), 12);
     }
+
+//    public User getUser(Long id) {
+//        try {
+//            return userRepo.findById(id).get();
+//        } catch (Exception e) {
+//            System.out.println(e);
+//            return null;
+//        }
+//    }
 
     public List<User> getAll() {
         try {
@@ -59,18 +67,21 @@ public class UserServiceImp {
                     )
             );
             user.setRoles(roleRepository.findAllByName("ROLE_USER"));
-            return userRepo.save(user);
+            User user1 = userRepo.save(user);
+            user1.setHashId(hashids.encode(user1.getId()));
+            return userRepo.save(user1);
         } catch (Exception e) {
             System.out.println(e);
             return null;
         }
     }
 
-    public User update(Long id, User user) {
+    public User update(String hashId, User user) {
         try {
-            User user1 = userRepo.findById(id).get();
+            User user1 = userRepo.findByHashId(hashId).get();
             user1.setFullname(user.getFullname());
             user1.setUsername(user.getUsername());
+            user1.setHashId(hashId);
             user1.setPassword(
                     passwordEncoder.encode(
                             user.getPassword()
@@ -82,13 +93,13 @@ public class UserServiceImp {
         }
     }
 
-    public Result delete(Long id) {
+    public Result delete(String hashId) {
         try {
-            List<Posts> posts = postRepository.findAllByUser(userRepo.findById(id).get());
+            List<Posts> posts = postRepository.findAllByUser(userRepo.findByHashId(hashId).get());
             for (Posts p : posts) {
-                postRepository.delete(p);
+                p.setUser(null);
             }
-            userRepo.deleteById(id);
+            userRepo.deleteById(userRepo.findByHashId(hashId).get().getId());
             return new Result(true, "user deleted");
         } catch (Exception e) {
             System.out.println(e);

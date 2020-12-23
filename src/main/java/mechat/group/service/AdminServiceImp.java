@@ -2,14 +2,16 @@ package mechat.group.service;
 
 import mechat.group.entity.Admins;
 import mechat.group.entity.Role;
+import mechat.group.entity.User;
 import mechat.group.model.Result;
 import mechat.group.repository.AdminRepo;
 import mechat.group.repository.RoleRepository;
+import mechat.group.repository.UserRepo;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +27,16 @@ public class AdminServiceImp {
     private RoleRepository roleRepository;
 
     @Autowired
+    private UserRepo userRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private final Hashids hashids;
+
+    public AdminServiceImp() {
+        this.hashids = new Hashids(getClass().getName(),12);
+    }
 
     public List<Admins> getAllAdmin() {
         try {
@@ -47,16 +58,38 @@ public class AdminServiceImp {
             roles.add(roleRepository.findByName("ROLE_USER"));
             roles.add(roleRepository.findByName("ROLE_ADMIN"));
             user.setRoles(roles);
-            return adminRepository.save(user);
+            Admins admins = adminRepository.save(user);
+            admins.setHashId(hashids.encode(admins.getId()));
+            return adminRepository.save(admins);
         } catch (Exception e) {
             System.out.println(e);
             return null;
         }
     }
+    public Result addAdmin(String hashId){
+        try{
+            User user = userRepository.findByHashId(hashId).get();
+            if (user.getRoles().size()==2){
+                return new Result(true, "this user always admin");
+            }
+            if (user!=null){
+                Set<Role> roles=new HashSet<>();
+                roles.add(roleRepository.findByName("ROLE_USER"));
+                roles.add(roleRepository.findByName("ROLE_ADMIN"));
+                user.setRoles(null);
+                user.setRoles(roles);
+                userRepository.save(user);
+                return new Result(true, "add admin");
+            }
+            return new Result(false,"user not found");
+        }catch (Exception e){
+            return new Result(false,e.getMessage());
+        }
+    }
 
-    public Admins update(Long id, Admins admins) {
+    public Admins update(String hashId, Admins admins) {
         try {
-            Admins user1 = adminRepository.findById(id).get();
+            Admins user1 = adminRepository.findByHashId(hashId).get();
             user1.setFullname(admins.getFullname());
             user1.setUsername(admins.getUsername());
             user1.setAbout(admins.getAbout());
@@ -77,9 +110,9 @@ public class AdminServiceImp {
         }
     }
 
-    public Result delete(Long id) {
+    public Result delete(String id) {
         try {
-            adminRepository.deleteById(id);
+            adminRepository.deleteById(adminRepository.findByHashId(id).get().getId());
             return new Result(true, "admin deleted");
         } catch (Exception e) {
             System.out.println(e);

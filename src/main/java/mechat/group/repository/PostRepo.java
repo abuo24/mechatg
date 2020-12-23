@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface PostRepo extends JpaRepository<Posts, Long> {
     List<Posts> findAllByUser(User user);
     Optional<Posts> findById(Long id);
+    Optional<Posts> findByHashId(String hashId);
+    List<Posts> findAll();
+    List<Posts> findAllByReplyPost(Posts posts);
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ import java.util.Set;
 
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String fullname;
@@ -32,6 +33,9 @@ public class User implements Serializable {
     private String username;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
+    private String hashId;
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private Date createAt;

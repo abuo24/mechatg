@@ -1,10 +1,10 @@
 package mechat.group.component;
 
-import mechat.group.entity.Admins;
 import mechat.group.entity.Role;
 import mechat.group.entity.User;
 import mechat.group.repository.RoleRepository;
 import mechat.group.repository.UserRepo;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +23,12 @@ public class DataLoader implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepo userRepository;
+
+    private final Hashids hashids;
+
+    public DataLoader() {
+        this.hashids = new Hashids(getClass().getName(), 12);
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -47,6 +53,9 @@ public class DataLoader implements CommandLineRunner {
             Set<Role> roles = new HashSet<>(roleRepository.findAll());
             user.setRoles(roles);
             user.setUsername("owner");
+            user.setPhoneNumber("+998932099924");
+            User user1 = userRepository.save(user);
+            user.setHashId(hashids.encode(user1.getId()));
             userRepository.save(user);
         } catch (Exception e) {
             System.out.println(e);

@@ -1,6 +1,7 @@
 package mechat.group.controller;
 
 import io.jsonwebtoken.Jwt;
+import mechat.group.entity.FileStorage;
 import mechat.group.entity.Posts;
 import mechat.group.entity.User;
 import mechat.group.model.Result;
@@ -11,13 +12,16 @@ import mechat.group.repository.UserRepo;
 import mechat.group.security.JwtTokenProvider;
 import mechat.group.service.PostsServiceImp;
 import mechat.group.service.UserServiceImp;
+import mechat.group.vm.PostPayload;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -45,14 +49,18 @@ public class PostsController {
         return ResponseEntity.ok(new ResultSucces(true, postsServiceImp.getAll()));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity createPost(@RequestBody Posts post, HttpServletRequest request) {
+    @PostMapping(value = "/add", consumes = {"multipart/form-data"})
+    public ResponseEntity createPost(@ModelAttribute PostPayload post, HttpServletRequest request) {
         User user = userServiceImp.WhoAmI(request);
-        return ResponseEntity.ok(new ResultSucces(true, postsServiceImp.createPosts(post, user)));
+        Posts posts = postsServiceImp.createPosts(post, user, post.getFile());
+        if(posts==null){
+            return new ResponseEntity(new Result(false,"post not create"), HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(new ResultSucces(true, posts));
     }
 
     @PutMapping("/update")
-    public ResponseEntity editUser(@RequestBody Posts post, HttpServletRequest request) {
+    public ResponseEntity editPost(@RequestBody Posts post, HttpServletRequest request) {
         User user = userServiceImp.WhoAmI(request);
         if (user.getId() == postRepository.findById(post.getId()).get().getUser().getId()) {
             return ResponseEntity.ok(postsServiceImp.updatePosts(post, user));
@@ -60,16 +68,16 @@ public class PostsController {
         return ResponseEntity.ok(new Result(false, "post not update"));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deletePost(@PathVariable Long id, HttpServletRequest request) {
+    @DeleteMapping("/delete/{hashId}")
+    public ResponseEntity deletePost(@PathVariable String hashId, HttpServletRequest request) {
         try {
             User user = userServiceImp.WhoAmI(request);
-            if (user.getId() == postRepository.findById(id).get().getUser().getId() || user.getRoles().size() == 2) {
-                return ResponseEntity.ok(postsServiceImp.delete(id));
+            if (user.getId() == postRepository.findByHashId(hashId).get().getUser().getId() || user.getRoles().size() == 2) {
+                return ResponseEntity.ok(postsServiceImp.delete(hashId));
             }
             return ResponseEntity.ok(new Result(false, "post not deleted"));
         } catch (Exception e) {
-            return new ResponseEntity(new Result(false, "post not deleted : " + e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new Result(false, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
