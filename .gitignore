@@ -1,9 +1,9 @@
 <<<<<<< HEAD
-*.idea
-*.mvn
-*.target
+.mvn
+.target
 =======
 *.idea
+.idea
 >>>>>>> 123e040da0260ac0ac7062653430b2e908ef3182
 # Compiled class file
 *.class
