@@ -3,17 +3,33 @@
 
 ## Api for Posts
 ``` 
-/api/posts/all  | GET faqat userlar va admin
+
+/api/posts/all  | GET barcha uchun
 /api/posts/add     | POST faqat userlar va admin
 /api/posts/delete/{id} | DELETE  faqat kommentariya egasi va admin 
 /api/posts/update | PUT faqat kommentariya egasi | id bodyda jo'natilsin 
-  ```
+```
  > Barchasi PROTETED API
  
- > Post uchun bodyda yuboriladigan ma'lumotlar
- ``` body:
-   * description: String 
+ > Post uchun yuboriladigan ma'lumotlar
+ ``` {multipart/form-data}:
+   * message: String,
+   * replyPost: String, (default{null})
+   * file: File (default{null})
 ```
+> Post malumotlarini o'zgartirish uchun
+```
+  * id: String,
+  * message: String
+```
+## Api for Post Files
+```
+/api/files/all | GET admin va userlar
+/api/files/preview/{id} | GET admin va userlar
+/api/files/download/{id} | GET admin va userlar
+```
+>Barchasi Protected API lar
+
 ## Api for Owner
 ```
 /api/owner/admin/add  | POST 
@@ -24,15 +40,16 @@
 ## Api For Admin
 ```
 /api/admin/user/add  | POST 
-/api/admin/users     | GET
+/api/admin/users     | GET | role==admin va role==owner 
 /api/admin/user/delete/{id} | DELETE
 /api/admin/user/updatedetails/{id} | PUT
 /api/admin/updatedetails | PUT 
 ``` 
-> Admin uchun bodyda yuborilishi kerak bo'lgan ma'lumotlar
+> Admin malumotlari uchun bodyda yuborilishi kerak bo'lgan ma'lumotlar
 ``` body:
-* fullname: String 
-* username: String
+* fullname: String,
+* username: String,
+* phoneNumber: String,
 * password: String,
 * about: String,
 * facebook: String,
@@ -48,7 +65,32 @@
 /api/auth/login     | POST
 /api/auth/getme   | GET 
 /api/auth/user/delete  | DELETE
-/api/auth/user/updatedetails | PUT 
+/api/auth/user/updatedetails | PUT
+***
+/api/auth/user/forgotpassword  | POST | phone
+/api/auth/user/checkcode/{code} | POST | phone va code
+/api/auth/user/editpassword  | POST | phone, code, password
+
+
+/api/auth/user/forgotpassword  | POST | phone
+body:
+  phone
+  
+
+/api/auth/user/checkcode/{code}  | POST | phone va code
+
+body:
+  phone
+
+/api/auth/user/editpassword  | POST | phone, code, password
+
+body:
+  password
+  
+header:
+  phone: String,
+  code: String
+
 ```
 > Protected APIs
 ```
@@ -58,8 +100,9 @@
 ```
 > Register User
 ```
-* fullname: String 
-* username: String
+* phoneNumber: String,
+* fullname: String,
+* username: String,
 * password: String
 ```
 > Login
@@ -67,6 +110,8 @@
 * username,
 * password
 ```
+>Minimal password uzunligi: 6
+
 > Protected API larda HEADER da token jo`natish kerak
 
 ``` 
