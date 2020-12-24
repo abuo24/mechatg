@@ -82,7 +82,7 @@ body:
 body:
   phone
 
-/api/auth/user/editpassword  | POST | phone va code
+/api/auth/user/editpassword  | POST | phone, code, password
 
 body:
   password
