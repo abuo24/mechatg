@@ -21,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/files")
 @CrossOrigin("http://localhost:8082")
+@RequestMapping("/api/files")
 public class FileController {
 
   @Autowired
