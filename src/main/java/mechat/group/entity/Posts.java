@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -16,18 +17,18 @@ import java.util.List;
 @Table(name = "posts")
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Posts{
+public class Posts {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "uuid",strategy = GenerationType.IDENTITY)
+    private String id;
     @Column(nullable = false)
     private String message;
-    @Column
-    private String hashId;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
     @OneToOne(fetch = FetchType.LAZY)
-    private FileStorage fileStorage;
+    private FileDB fileDB;
+
     @ManyToOne
     private Posts replyPost;
     @Column(nullable = false, updatable = false)

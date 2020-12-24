@@ -3,7 +3,7 @@ package mechat.group.controller;
 import mechat.group.entity.User;
 import mechat.group.model.Result;
 import mechat.group.model.ResultSucces;
-import mechat.group.repository.ConfirmationTokenRepository;
+import mechat.group.repository.ConfirmationRepository;
 import mechat.group.repository.UserRepo;
 import mechat.group.security.ConfirmationToken;
 import mechat.group.security.JwtTokenProvider;
@@ -13,11 +13,9 @@ import mechat.group.vm.LoginVM;
 import mechat.group.vm.SmsPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,8 +38,7 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private final ConfirmationTokenRepository confirmationTokenRepository;
-
+    private final ConfirmationRepository confirmationRepository;
     private final TwilioService twilioService;
 
     private final PasswordEncoder passwordEncoder;
@@ -49,13 +46,13 @@ public class AuthController {
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenProvider jwtTokenProvider,
-                          UserRepo userRepository, UserServiceImp userServiceImp, ConfirmationTokenRepository confirmationTokenRepository, TwilioService twilioService, PasswordEncoder passwordEncoder
+                          UserRepo userRepository, UserServiceImp userServiceImp, ConfirmationRepository confirmationRepository, TwilioService twilioService, PasswordEncoder passwordEncoder
     ) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.userServiceImp = userServiceImp;
-        this.confirmationTokenRepository = confirmationTokenRepository;
+        this.confirmationRepository = confirmationRepository;
         this.twilioService = twilioService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -90,7 +87,7 @@ public class AuthController {
                 return new ResponseEntity(new Result(false, "Bu username band"), BAD_REQUEST);
             }
         }
-        User user2 = userServiceImp.update(user1.getHashId(), user);
+        User user2 = userServiceImp.update(user1.getId(), user);
         String token1 = jwtTokenProvider.createToken(user2.getUsername(), user2.getRoles());
         Map<Object, Object> map = new HashMap<>();
         map.put("succes", true);
@@ -102,7 +99,7 @@ public class AuthController {
     @DeleteMapping("/user/delete")
     public ResponseEntity delete(HttpServletRequest httpServletRequest) {
         User user1 = userServiceImp.WhoAmI(httpServletRequest);
-        return ResponseEntity.ok(userServiceImp.delete(user1.getHashId()));
+        return ResponseEntity.ok(userServiceImp.delete(user1.getId()));
     }
 
     @PostMapping("/login")
@@ -135,9 +132,9 @@ public class AuthController {
     @PostMapping("/forgotpassword")
     public ResponseEntity forgotPassword(@RequestBody String phone) {
         User existingUser = userRepository.findByPhoneNumber(phone);
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUser(existingUser);
+        ConfirmationToken confirmationToken = confirmationRepository.findByUser(existingUser);
         if (confirmationToken != null) {
-            confirmationTokenRepository.delete(confirmationToken);
+            confirmationRepository.delete(confirmationToken);
         }
         if (existingUser != null) {
 
@@ -146,7 +143,7 @@ public class AuthController {
 
             double a = 1000 + Math.random() * 10000;
             confirmationToken1.setCode(String.valueOf((int) Math.ceil(a)));
-            confirmationTokenRepository.save(confirmationToken1);
+            confirmationRepository.save(confirmationToken1);
 
             SmsPayload smsPayload = new SmsPayload(phone, confirmationToken1.getCode());
             twilioService.sendSms(smsPayload);
@@ -159,7 +156,7 @@ public class AuthController {
     @PostMapping("/checkcode/{code}")
     public ResponseEntity forgotPassword(@RequestBody String phone, @PathVariable String code) {
         User user = userRepository.findByPhoneNumber(phone);
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUser(user);
+        ConfirmationToken confirmationToken = confirmationRepository.findByUser(user);
         if (confirmationToken != null) {
             if (confirmationToken.getCode().equals(code) && confirmationToken.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.ok(new ResultSucces(true, "code true"));
@@ -172,11 +169,11 @@ public class AuthController {
     @PostMapping("/editpassword")
     public ResponseEntity forgotPassword(@RequestBody String password, HttpServletRequest request) {
         User user = userRepository.findByPhoneNumber(request.getHeader("phone"));
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUser(user);
+        ConfirmationToken confirmationToken = confirmationRepository.findByUser(user);
         if (confirmationToken.getCode().equals(request.getHeader("code")) && user != null && password.length() >= 6) {
             user.setPassword(password);
-            confirmationTokenRepository.delete(confirmationToken);
-            User user2 = userServiceImp.update(user.getHashId(), user);
+            confirmationRepository.delete(confirmationToken);
+            User user2 = userServiceImp.update(user.getId(), user);
             String token1 = jwtTokenProvider.createToken(user2.getUsername(), user2.getRoles());
             Map<Object, Object> map = new HashMap<>();
             map.put("succes", true);

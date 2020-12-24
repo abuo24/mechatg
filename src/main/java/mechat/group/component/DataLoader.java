@@ -24,23 +24,17 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private UserRepo userRepository;
 
-    private final Hashids hashids;
-
-    public DataLoader() {
-        this.hashids = new Hashids(getClass().getName(), 12);
-    }
 
     @Override
     public void run(String... args) throws Exception {
-        Role roleOwner = new Role(1l, "ROLE_OWNER");
-        Role roleAdmin = new Role(2l, "ROLE_ADMIN");
-        Role roleUser = new Role(3l, "ROLE_USER");
+        Role roleOwner = new Role("1", "ROLE_OWNER");
+        Role roleAdmin = new Role("2", "ROLE_ADMIN");
+        Role roleUser = new Role("3", "ROLE_USER");
         try {
             roleRepository.save(roleOwner);
             roleRepository.save(roleAdmin);
             roleRepository.save(roleUser);
         } catch (Exception e) {
-            System.out.println(e);
         }
         try {
             User user = new User();
@@ -54,11 +48,8 @@ public class DataLoader implements CommandLineRunner {
             user.setRoles(roles);
             user.setUsername("owner");
             user.setPhoneNumber("+998932099924");
-            User user1 = userRepository.save(user);
-            user.setHashId(hashids.encode(user1.getId()));
             userRepository.save(user);
         } catch (Exception e) {
-            System.out.println(e);
         }
     }
 

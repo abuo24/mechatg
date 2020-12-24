@@ -31,30 +31,13 @@ public class UserServiceImp {
     @Autowired
     private PostRepo postRepository;
 
-    private final Hashids hashids;
-
-
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
-
-    public UserServiceImp() {
-        this.hashids = new Hashids(getClass().getName(), 12);
-    }
-
-//    public User getUser(Long id) {
-//        try {
-//            return userRepo.findById(id).get();
-//        } catch (Exception e) {
-//            System.out.println(e);
-//            return null;
-//        }
-//    }
 
     public List<User> getAll() {
         try {
             return userRepo.findAll();
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
@@ -68,20 +51,17 @@ public class UserServiceImp {
             );
             user.setRoles(roleRepository.findAllByName("ROLE_USER"));
             User user1 = userRepo.save(user);
-            user1.setHashId(hashids.encode(user1.getId()));
             return userRepo.save(user1);
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
 
-    public User update(String hashId, User user) {
+    public User update(String id, User user) {
         try {
-            User user1 = userRepo.findByHashId(hashId).get();
+            User user1 = userRepo.findById(id).get();
             user1.setFullname(user.getFullname());
             user1.setUsername(user.getUsername());
-            user1.setHashId(hashId);
             user1.setPassword(
                     passwordEncoder.encode(
                             user.getPassword()
@@ -93,16 +73,15 @@ public class UserServiceImp {
         }
     }
 
-    public Result delete(String hashId) {
+    public Result delete(String id) {
         try {
-            List<Posts> posts = postRepository.findAllByUser(userRepo.findByHashId(hashId).get());
+            List<Posts> posts = postRepository.findAllByUser(userRepo.findById(id).get());
             for (Posts p : posts) {
                 p.setUser(null);
             }
-            userRepo.deleteById(userRepo.findByHashId(hashId).get().getId());
+            userRepo.deleteById(userRepo.findById(id).get().getId());
             return new Result(true, "user deleted");
         } catch (Exception e) {
-            System.out.println(e);
             return new Result(false, "user not deleting");
         }
     }

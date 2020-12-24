@@ -1,7 +1,6 @@
 package mechat.group.controller;
 
 import io.jsonwebtoken.Jwt;
-import mechat.group.entity.FileStorage;
 import mechat.group.entity.Posts;
 import mechat.group.entity.User;
 import mechat.group.model.Result;
@@ -62,18 +61,18 @@ public class PostsController {
     @PutMapping("/update")
     public ResponseEntity editPost(@RequestBody Posts post, HttpServletRequest request) {
         User user = userServiceImp.WhoAmI(request);
-        if (user.getId() == postRepository.findById(post.getId()).get().getUser().getId()) {
+        if (user.getId().equals(postRepository.findById(post.getId()).get().getUser().getId())) {
             return ResponseEntity.ok(postsServiceImp.updatePosts(post, user));
         }
         return ResponseEntity.ok(new Result(false, "post not update"));
     }
 
-    @DeleteMapping("/delete/{hashId}")
-    public ResponseEntity deletePost(@PathVariable String hashId, HttpServletRequest request) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity deletePost(@PathVariable String id, HttpServletRequest request) {
         try {
             User user = userServiceImp.WhoAmI(request);
-            if (user.getId() == postRepository.findByHashId(hashId).get().getUser().getId() || user.getRoles().size() == 2) {
-                return ResponseEntity.ok(postsServiceImp.delete(hashId));
+            if (user.getId().equals(postRepository.findById(id).get().getUser().getId()) || user.getRoles().size() == 2) {
+                return ResponseEntity.ok(postsServiceImp.delete(id));
             }
             return ResponseEntity.ok(new Result(false, "post not deleted"));
         } catch (Exception e) {

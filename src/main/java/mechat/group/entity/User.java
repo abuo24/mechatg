@@ -4,14 +4,13 @@ package mechat.group.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Check;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.convert.DataSizeUnit;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -22,11 +21,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GeneratedValue(generator = "uuid")
+    private String id;
     @Column(nullable = false)
     private String fullname;
     @Column(nullable = false, unique = true)
@@ -35,7 +34,6 @@ public class User implements Serializable {
     private String password;
     @Column(nullable = false, unique = true)
     private String phoneNumber;
-    private String hashId;
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private Date createAt;

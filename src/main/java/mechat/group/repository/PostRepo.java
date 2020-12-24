@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PostRepo extends JpaRepository<Posts, Long> {
+public interface PostRepo extends JpaRepository<Posts, String> {
     List<Posts> findAllByUser(User user);
-    Optional<Posts> findById(Long id);
-    Optional<Posts> findByHashId(String hashId);
+    Optional<Posts> findById(String id);
     List<Posts> findAll();
     List<Posts> findAllByReplyPost(Posts posts);
 }

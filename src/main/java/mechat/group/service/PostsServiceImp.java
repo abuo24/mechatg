@@ -1,6 +1,7 @@
 package mechat.group.service;
 
-import mechat.group.entity.FileStorage;
+import mechat.group.entity.FileDB;
+//import mechat.group.entity.FileStorage;
 import mechat.group.entity.Posts;
 import mechat.group.entity.User;
 import mechat.group.model.Result;
@@ -31,13 +32,6 @@ public class PostsServiceImp {
     @Autowired
     protected FileStorageService fileStorageService;
 
-    private final Hashids hashids;
-
-    public PostsServiceImp() {
-        this.hashids = new Hashids(getClass().getName(), 12);
-        ;
-    }
-
     public List<Posts> getAll() {
         try {
             List<Posts> postsList = postRepository.findAll();
@@ -54,16 +48,15 @@ public class PostsServiceImp {
             if (post.getReplyPost() != null) {
                 posts.setReplyPost(postRepository.findById(post.getReplyPost()).get());
             }
-            FileStorage fileStorage = null;
+            FileDB fileStorage = null;
             if (multipartFile != null) {
-                fileStorage = fileStorageService.save(multipartFile);
+                fileStorage = fileStorageService.store(multipartFile);
                 if (fileStorage != null) {
-                    posts.setFileStorage(fileStorage);
+                    posts.setFileDB(fileStorage);
                 }
             }
             posts.setUser(user);
             Posts posts1 = postRepository.save(posts);
-            posts1.setHashId(hashids.encode(posts1.getId()));
             return postRepository.save(posts1);
         } catch (Exception e) {
             return null;
@@ -72,12 +65,11 @@ public class PostsServiceImp {
 
     public Posts updatePosts(Posts post, User user) {
         try {
-            Posts posts = postRepository.findByHashId(post.getHashId()).get();
+            Posts posts = postRepository.findById(post.getId()).get();
             post.setCreateAt(posts.getCreateAt());
             post.setReplyPost(posts.getReplyPost());
-            post.setFileStorage(posts.getFileStorage());
+            post.setFileDB(posts.getFileDB());
             post.setUser(user);
-            post.setHashId(posts.getHashId());
             post.setId(posts.getId());
             return postRepository.save(post);
         } catch (Exception e) {
@@ -88,18 +80,18 @@ public class PostsServiceImp {
 
     public Result delete(String id) {
         try {
-            Posts posts = postRepository.findByHashId(id).get();
-            if (posts.getFileStorage() != null) {
-                fileStorageService.delete(posts.getFileStorage().getHashId());
+            Posts posts = postRepository.findById(id).get();
+            if (posts.getFileDB() != null) {
+                fileStorageService.delete(posts.getFileDB().getId());
             }
-            List<Posts> postsList = postRepository.findAllByReplyPost(postRepository.findByHashId(id).get());
+            List<Posts> postsList = postRepository.findAllByReplyPost(postRepository.findById(id).get());
             if (posts != null) {
                 for (int i = 0; i < postsList.size(); i++) {
                     postsList.get(i).setReplyPost(null);
                 }
             }
-            if (postRepository.findByHashId(id).get().getId() != null) {
-                postRepository.deleteById(postRepository.findByHashId(id).get().getId());
+            if (postRepository.findById(id).get().getId() != null) {
+                postRepository.deleteById(postRepository.findById(id).get().getId());
                 return new Result(true, "post deleted");
             }
             return new Result(false, "post not deleting");

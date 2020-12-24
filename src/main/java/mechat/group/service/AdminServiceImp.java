@@ -32,17 +32,10 @@ public class AdminServiceImp {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final Hashids hashids;
-
-    public AdminServiceImp() {
-        this.hashids = new Hashids(getClass().getName(),12);
-    }
-
     public List<Admins> getAllAdmin() {
         try {
             return adminRepository.findAll();
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
@@ -59,16 +52,14 @@ public class AdminServiceImp {
             roles.add(roleRepository.findByName("ROLE_ADMIN"));
             user.setRoles(roles);
             Admins admins = adminRepository.save(user);
-            admins.setHashId(hashids.encode(admins.getId()));
             return adminRepository.save(admins);
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
-    public Result addAdmin(String hashId){
+    public Result addAdmin(String id){
         try{
-            User user = userRepository.findByHashId(hashId).get();
+            User user = userRepository.findById(id).get();
             if (user.getRoles().size()==2){
                 return new Result(true, "this user always admin");
             }
@@ -87,9 +78,9 @@ public class AdminServiceImp {
         }
     }
 
-    public Admins update(String hashId, Admins admins) {
+    public Admins update(String id, Admins admins) {
         try {
-            Admins user1 = adminRepository.findByHashId(hashId).get();
+            Admins user1 = adminRepository.findById(id).get();
             user1.setFullname(admins.getFullname());
             user1.setUsername(admins.getUsername());
             user1.setAbout(admins.getAbout());
@@ -105,17 +96,15 @@ public class AdminServiceImp {
 
             return adminRepository.save(user1);
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
 
     public Result delete(String id) {
         try {
-            adminRepository.deleteById(adminRepository.findByHashId(id).get().getId());
+            adminRepository.deleteById(adminRepository.findById(id).get().getId());
             return new Result(true, "admin deleted");
         } catch (Exception e) {
-            System.out.println(e);
             return new Result(false, e.getMessage());
         }
     }

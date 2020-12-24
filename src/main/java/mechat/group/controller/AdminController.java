@@ -60,17 +60,17 @@ public class AdminController {
         return ResponseEntity.ok(new ResultSucces(true, userServiceImp.create(user)));
     }
 
-    @PutMapping("/user/updatedetails/{hashId}")
-    public ResponseEntity editUser(@PathVariable String hashId, @RequestBody User user) {
+    @PutMapping("/user/updatedetails/{id}")
+    public ResponseEntity editUser(@PathVariable String id, @RequestBody User user) {
         if (!checkPasswordLength(user.getPassword())) {
             return new ResponseEntity(new Result(false, "Parol uzunligi 6 dan kam"), HttpStatus.BAD_REQUEST);
         }
-        if (!user.getUsername().equals(userRepository.findByHashId(hashId).get().getUsername())) {
+        if (!user.getUsername().equals(userRepository.findById(id).get().getUsername())) {
             if (userServiceImp.checkUsername(user.getUsername())) {
                 return new ResponseEntity(new Result(false, "Bu username band"), HttpStatus.BAD_REQUEST);
             }
         }
-        User user1 = userServiceImp.update(hashId, user);
+        User user1 = userServiceImp.update(id, user);
         if (user1 == null) {
             return ResponseEntity.ok(new ResultSucces(true, "not updated"));
         }
@@ -90,7 +90,7 @@ public class AdminController {
                     return new ResponseEntity(new Result(false, "Bu username band"), HttpStatus.BAD_REQUEST);
                 }
             }
-            Admins admins1 = adminServiceImp.update(admins.getHashId(), admin);
+            Admins admins1 = adminServiceImp.update(admins.getId(), admin);
             String token1 = jwtTokenProvider.createToken(admins1.getUsername(), admins1.getRoles());
             Map<Object, Object> map = new HashMap<>();
             map.put("succes", true);
@@ -102,9 +102,9 @@ public class AdminController {
         }
     }
 
-    @DeleteMapping("/user/delete/{hashId}")
-    public ResponseEntity delete(@PathVariable String hashId) {
-        return ResponseEntity.ok(userServiceImp.delete(hashId));
+    @DeleteMapping("/user/delete/{id}")
+    public ResponseEntity delete(@PathVariable String id) {
+        return ResponseEntity.ok(userServiceImp.delete(id));
     }
 
     private boolean checkPasswordLength(String password) {

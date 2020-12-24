@@ -6,5 +6,4 @@ public interface SmsSender {
 
     void sendSms(SmsPayload smsRequest);
 
-    // or maybe void sendSms(String phoneNumber, String message);
 }
