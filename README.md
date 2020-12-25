@@ -33,6 +33,7 @@
 ## Api for Owner
 ```
 /api/owner/admin/add  | POST 
+/api/owner/admin/add/{id} | PUT userlarga adminlik huquqini berish
 /api/owner/admins     | GET
 /api/owner/admin/delete/{id} | DELETE
 /api/owner/admin/updatedetails/{id} | PUT
