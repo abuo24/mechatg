@@ -2,6 +2,8 @@ package mechat.group.entity;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,21 +17,26 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "files")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
 public class FileDB {
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @GeneratedValue(generator = "uuid",strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "uuid")
     private String id;
 
+    @Column()
     private String name;
-
+    @Column
     private String type;
-
-    private Long fileSize;
+    @Column
+    private long fileSize;
 
     @Lob
     private byte[] data;
     @Column(nullable = false, updatable = false)
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp
     private Date createAt;
 

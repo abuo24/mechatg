@@ -1,8 +1,8 @@
 package mechat.group.controller;
 
-import io.jsonwebtoken.Jwt;
 import mechat.group.entity.Posts;
 import mechat.group.entity.User;
+import mechat.group.vm.ResponseFile;
 import mechat.group.model.Result;
 import mechat.group.model.ResultSucces;
 import mechat.group.repository.AdminRepo;
@@ -12,17 +12,15 @@ import mechat.group.security.JwtTokenProvider;
 import mechat.group.service.PostsServiceImp;
 import mechat.group.service.UserServiceImp;
 import mechat.group.vm.PostPayload;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import mechat.group.vm.PostRes;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -43,17 +41,62 @@ public class PostsController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity getOne(@RequestParam String id) {
+        Posts post = postsServiceImp.getOne(id);
+        if (post == null) {
+            return new ResponseEntity(new Result(false, "post not found"), HttpStatus.BAD_REQUEST);
+        }
+        ResponseFile file = new ResponseFile();
+        if (post.getFileDB() != null) {
+            String fileDownloadUri = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("api/files/preview/")
+                    .path(post.getFileDB().getId())
+                    .toUriString();
+
+            file = new ResponseFile(post.getMessage(), fileDownloadUri, post.getFileDB().getType(), post.getFileDB().getData().length);
+        }
+        String rId = null;
+        if (post.getReplyPost() != null) {
+            rId = post.getReplyPost().getId();
+        }
+        PostRes postRes = new PostRes(post.getMessage(), file, rId, post.getCreateAt().toString(), post.getUpdateAt().toString());
+        return ResponseEntity.ok(new ResultSucces(true, postRes));
+    }
+
     @GetMapping("/all")
     public ResponseEntity getAllPosts() {
-        return ResponseEntity.ok(new ResultSucces(true, postsServiceImp.getAll()));
+        List<PostRes> posts = postsServiceImp.getAllPosts().map(post -> {
+            ResponseFile file = new ResponseFile();
+            if (post.getFileDB() != null) {
+                String fileDownloadUri = ServletUriComponentsBuilder
+                        .fromCurrentContextPath()
+                        .path("api/files/preview/")
+                        .path(post.getFileDB().getId())
+                        .toUriString();
+
+                file = new ResponseFile(post.getMessage(), fileDownloadUri, post.getFileDB().getType(), post.getFileDB().getData().length);
+            }
+            String rId = null;
+            if (post.getReplyPost() != null) {
+                rId = post.getReplyPost().getId();
+            }
+            return new PostRes(
+                    post.getMessage(),
+                    file,
+                    rId, post.getCreateAt().toString(), post.getUpdateAt().toString());
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(new ResultSucces(true, posts));
     }
 
     @PostMapping(value = "/add", consumes = {"multipart/form-data"})
     public ResponseEntity createPost(@ModelAttribute PostPayload post, HttpServletRequest request) {
         User user = userServiceImp.WhoAmI(request);
         Posts posts = postsServiceImp.createPosts(post, user, post.getFile());
-        if(posts==null){
-            return new ResponseEntity(new Result(false,"post not create"), HttpStatus.BAD_REQUEST);
+        if (posts == null) {
+            return new ResponseEntity(new Result(false, "post not create"), HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(new ResultSucces(true, posts));
     }

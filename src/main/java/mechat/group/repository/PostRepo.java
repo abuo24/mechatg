@@ -12,6 +12,5 @@ import java.util.Optional;
 public interface PostRepo extends JpaRepository<Posts, String> {
     List<Posts> findAllByUser(User user);
     Optional<Posts> findById(String id);
-    List<Posts> findAll();
     List<Posts> findAllByReplyPost(Posts posts);
 }

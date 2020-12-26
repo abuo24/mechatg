@@ -11,12 +11,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-
 public class Role {
-
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    @GeneratedValue(generator = "uuid",strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "uuid")
     private String id;
 
     @Column(nullable = false,unique = true)

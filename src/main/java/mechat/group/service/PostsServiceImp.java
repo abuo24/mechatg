@@ -8,18 +8,18 @@ import mechat.group.model.Result;
 import mechat.group.repository.PostRepo;
 import mechat.group.repository.UserRepo;
 import mechat.group.vm.PostPayload;
-import org.hashids.Hashids;
+//import mechat.group.vm.PostRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @Service
 public class PostsServiceImp {
-
     @Autowired
     private UserRepo userRepo;
 
@@ -34,11 +34,19 @@ public class PostsServiceImp {
 
     public List<Posts> getAll() {
         try {
-            List<Posts> postsList = postRepository.findAll();
-            return postsList;
+            return postRepository.findAll();
         } catch (Exception e) {
             return null;
         }
+    }
+
+
+    public Stream<Posts> getAllPosts() {
+        return postRepository.findAll().stream();
+    }
+
+    public Posts getOne(String id) {
+        return postRepository.findById(id).get();
     }
 
     public Posts createPosts(PostPayload post, User user, MultipartFile multipartFile) {
