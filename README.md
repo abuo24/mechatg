@@ -29,7 +29,7 @@
 /api/files/preview/{id} | GET barcha uchun
 /api/files/download/{id} | GET barcha uchun
 ```
->Barchasi Protected API lar
+> Protected API (../all)
 
 ## Api for Owner
 ```
