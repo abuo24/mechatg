@@ -112,7 +112,8 @@ header:
 * username,
 * password
 ```
->Minimal password uzunligi: 6
+> Minimal password uzunligi: 6
+> Maximal file size: 1MB
 
 > Protected API larda HEADER da token jo`natish kerak
 
