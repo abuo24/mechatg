@@ -3,32 +3,33 @@
 
 ## Api for Posts
 ``` 
-
-/api/posts/all  | GET barcha uchun
+/api/posts/{id} | GET | barcha uchun
+/api/posts/all  | GET | barcha uchun
 /api/posts/add     | POST faqat userlar va admin
 /api/posts/delete/{id} | DELETE  faqat kommentariya egasi va admin 
 /api/posts/update | PUT faqat kommentariya egasi | id bodyda jo'natilsin 
 ```
- > Barchasi PROTETED API
+ > Barchasi PROTETED API (/all va posts/{id} dan tashqari)
  
  > Post uchun yuboriladigan ma'lumotlar
- ``` {multipart/form-data}:
+ ``` 
+ {multipart/form-data}:
    * message: String,
    * replyPost: String, (default{null})
-   * file: File (default{null})
+   * file: File (default{null}| image || video || gif)
 ```
-> Post malumotlarini o'zgartirish uchun
+> Post malumotlarini o'zgartirish uchun (for PUT method)
 ```
   * id: String,
   * message: String
 ```
 ## Api for Post Files
 ```
-/api/files/all | GET admin va userlar
-/api/files/preview/{id} | GET admin va userlar
-/api/files/download/{id} | GET admin va userlar
+/api/files/all | GET admin
+/api/files/preview/{id} | GET barcha uchun
+/api/files/download/{id} | GET barcha uchun
 ```
->Barchasi Protected API lar
+> Protected API (../all)
 
 ## Api for Owner
 ```
@@ -111,7 +112,9 @@ header:
 * username,
 * password
 ```
->Minimal password uzunligi: 6
+> Minimal password uzunligi: 6
+
+> Maximal file size: 1MB
 
 > Protected API larda HEADER da token jo`natish kerak
 
