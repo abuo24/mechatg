@@ -53,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/forgotpassword","/api/auth/checkcode/*","/api/auth/editpassword").permitAll()
-                .antMatchers("/api/auth/register", "/api/auth/login", "/api/auth/getme", "/api/posts/all","/api/files/preview/*","/api/files/download/*").permitAll()
+                .antMatchers("/api/auth/register", "/api/auth/login", "/api/auth/getme", "/api/posts/all","/api/posts/{id}","/api/files/preview/*","/api/files/download/*").permitAll()
                 .antMatchers("/api/auth/user/**").hasAuthority("ROLE_USER")
                 .antMatchers("/api/admin/**", "/api/files/all").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/api/owner/**", "/api/admin/users").hasAuthority("ROLE_OWNER")
