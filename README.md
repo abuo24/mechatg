@@ -3,13 +3,13 @@
 
 ## Api for Posts
 ``` 
-
+/api/posts/{id} | GET | barcha uchun
 /api/posts/all  | GET | barcha uchun
 /api/posts/add     | POST faqat userlar va admin
 /api/posts/delete/{id} | DELETE  faqat kommentariya egasi va admin 
 /api/posts/update | PUT faqat kommentariya egasi | id bodyda jo'natilsin 
 ```
- > Barchasi PROTETED API (/all dan tashqari)
+ > Barchasi PROTETED API (/all va posts/{id} dan tashqari)
  
  > Post uchun yuboriladigan ma'lumotlar
  ``` 
