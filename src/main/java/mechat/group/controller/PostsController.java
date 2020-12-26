@@ -42,7 +42,7 @@ public class PostsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getOne(@RequestParam String id) {
+    public ResponseEntity getOne(@PathVariable String id) {
         Posts post = postsServiceImp.getOne(id);
         if (post == null) {
             return new ResponseEntity(new Result(false, "post not found"), HttpStatus.BAD_REQUEST);
