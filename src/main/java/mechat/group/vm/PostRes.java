@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class PostRes {
 
     private String message;
+    private UserRes user;
     private ResponseFile file;
     private String replyPostId;
     private String createAt;

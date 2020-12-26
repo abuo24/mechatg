@@ -13,6 +13,7 @@ import mechat.group.service.PostsServiceImp;
 import mechat.group.service.UserServiceImp;
 import mechat.group.vm.PostPayload;
 import mechat.group.vm.PostRes;
+import mechat.group.vm.UserRes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,8 @@ public class PostsController {
         if (post.getReplyPost() != null) {
             rId = post.getReplyPost().getId();
         }
-        PostRes postRes = new PostRes(post.getMessage(), file, rId, post.getCreateAt().toString(), post.getUpdateAt().toString());
+        UserRes userRes = new UserRes(post.getUser().getId(), post.getUser().getFullname(), post.getUser().getUsername(), post.getUser().getPhoneNumber());
+        PostRes postRes = new PostRes(post.getMessage(), userRes, file, rId, post.getCreateAt().toString(), post.getUpdateAt().toString());
         return ResponseEntity.ok(new ResultSucces(true, postRes));
     }
 
@@ -82,8 +84,10 @@ public class PostsController {
             if (post.getReplyPost() != null) {
                 rId = post.getReplyPost().getId();
             }
+            UserRes userRes = new UserRes(post.getUser().getId(), post.getUser().getFullname(), post.getUser().getUsername(), post.getUser().getPhoneNumber());
             return new PostRes(
                     post.getMessage(),
+                    userRes,
                     file,
                     rId, post.getCreateAt().toString(), post.getUpdateAt().toString());
         }).collect(Collectors.toList());
