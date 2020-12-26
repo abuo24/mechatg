@@ -18,7 +18,7 @@
    * replyPost: String, (default{null})
    * file: File (default{null}| image || video || gif)
 ```
-> Post malumotlarini o'zgartirish uchun
+> Post malumotlarini o'zgartirish uchun (for PUT method)
 ```
   * id: String,
   * message: String
