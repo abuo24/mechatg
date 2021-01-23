@@ -150,7 +150,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new ResultSucces(true, "we send you a confirmation code"));
         }
-        return new ResponseEntity(new Result(false, "email not found from database"), BAD_REQUEST);
+        return new ResponseEntity(new Result(false, "phone not found from database"), BAD_REQUEST);
     }
 
     @PostMapping("/checkcode/{code}")
